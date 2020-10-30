@@ -1,28 +1,40 @@
 <template>
     <div>
-        <h1>listado de productos</h1>
+        <h2>listado de productos</h2>
         <hr>
         <ul>
             <li v-for="product in products" :key="product.id">
                 {{ product.title }} | {{ product.price }}
                 <i> {{ product.inventory }} </i>
+                <button @click="addToCart(product)" >cart</button>
             </li>
         </ul>
     </div>
 </template>
 
 <script>
-import api from '../api/shop';
+//import api from '../api/shop';
 export default {
     name: 'AppProductList',
-    created() {
-        api.getProducts(
-            products => this.$store.commit('setProducts', products));
+    async created() {
+        try {
+            await this.$store.dispatch('getProducts')
+        } catch(error) {
+            console.log(error);
+        }
+        //api.getProducts(
+        //    products => this.$store.commit('setProducts', products));
         
+    },
+    methods: {
+        addToCart(product) {
+            this.$store.dispatch('addProductToCart', product)
+        }
     },
     computed: {
         products() {
-            return this.$store.state.products;
+            //return this.$store.state.products;
+            return this.$store.getters.productOnStock
         }
     }
 }
