@@ -6,14 +6,30 @@ import api from '../api/shop';
 Vue.use(Vuex);
 
 export default new Vuex.Store({
+    strict: true,
     state: {
         products: [],
         cart: [],
-        checkoutError: false
+        checkoutError: false,
+        selectedProduct: {}
     },
     mutations: {
         setProducts(state, products) {
             state.products = products
+        },
+        setSelectedProduct(state, product) {
+            state.selectedProduct = product;
+        },
+        editProduct(state, data) {
+            //buscar el indice  del producto
+            const index = state.products.findIndex(product => product.id === state.selectedProduct.id);
+
+            //componer el producto en base a las propiedades cambiadas
+            const product = Object.assign({}, state.products[index], data);
+
+            //actualizar activando la reactividad
+            Vue.set(state.products, index, product);
+
         },
         incrementProductQuantity(state, item) {
             item.quantity++;
@@ -40,6 +56,7 @@ export default new Vuex.Store({
         setCheckoutError(state, error) {
             state.checkoutError = error;
         }
+
     },
     actions: {
         getProducts({commit}) {
@@ -109,6 +126,14 @@ export default new Vuex.Store({
         },
         cartTotal(state, getters) {
             return getters.productsOnCart.reduce((total, current) => total + current.price * current.quantity, 0)
+        },
+        selectedProduct(state) {
+            return state.selectedProduct;
+        },
+        nearlySoldOut(state) {
+            return id => {
+                return state.products.find(product => product.id === id).inventory < 2;
+            }
         }
     },
     modules: {

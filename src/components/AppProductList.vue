@@ -3,7 +3,12 @@
         <h2>listado de productos</h2>
         <hr>
         <ul>
-            <li v-for="product in products" :key="product.id">
+            <li 
+                :class="{'sold-out': $store.getters.nearlySoldOut(product.id) }"
+                @click="selectProduct(product)" 
+                v-for="product in products" 
+                :key="product.id"
+            >
                 {{ product.title }} | {{ product.price }}
                 <i> {{ product.inventory }} </i>
                 <button @click="addToCart(product)" >cart</button>
@@ -29,6 +34,9 @@ export default {
     methods: {
         addToCart(product) {
             this.$store.dispatch('addProductToCart', product)
+        },
+        selectProduct(product) {
+            this.$store.commit('setSelectedProduct', product);
         }
     },
     computed: {
@@ -43,5 +51,12 @@ export default {
 <style scoped>
     ul {
         text-align: left;
+    }
+
+    .sold-out {
+        background-color: lightpink;
+        border: 3px solid tomato;
+        padding: 0.3rem;
+        margin: 0.1rem;
     }
 </style>
